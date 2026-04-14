@@ -4,6 +4,16 @@ import { config } from '../config'
 export const pool = new Pool({ connectionString: config.databaseUrl })
 
 export async function initDb(): Promise<void> {
+  // Test connection first — give a clear error if Postgres isn't running
+  try {
+    await pool.query('SELECT 1')
+  } catch (err) {
+    throw new Error(
+      `Cannot connect to PostgreSQL at ${process.env.DATABASE_URL ?? 'localhost:5432'}.\n` +
+      `Start Postgres or set DATABASE_URL in .env\nOriginal error: ${err}`
+    )
+  }
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS positions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

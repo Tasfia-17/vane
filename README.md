@@ -125,21 +125,49 @@ The proxy wallet API at `POST /v1/thirdParty/tx/sendSwapOrder` creates orders wi
 
 You need Node.js 18 or higher, a PostgreSQL instance, and an AVE Claw API key from cloud.ave.ai.
 
+**Get your API keys**
+
+Register at cloud.ave.ai to get your AVE API key. For proxy wallet trading you also need an access key, secret key, and assets ID from the same dashboard. The free plan gives you the data REST API. The pro plan adds WebSocket real-time streams.
+
+**Database**
+
+```
+createdb vane
+```
+
+Or set DATABASE_URL in your .env to point at any existing Postgres instance. The schema is created automatically on first start.
+
+**Backend**
+
 ```
 cd backend
 cp .env.example .env
 ```
 
-Fill in your AVE API key, access key, secret key, and assets ID in the .env file. Then:
+Edit .env and fill in your four AVE keys and your DATABASE_URL. Then:
 
 ```
-cd backend && npm install && npm run dev
-cd frontend && npm install && npm run dev
+npm install
+npm run dev
 ```
 
-Open http://localhost:3000. The backend runs on port 3001 and the WebSocket server on port 8080.
+**Frontend**
 
-The WebSocket tx listener requires a pro API plan. On free or normal plans, VANE still works using the 60 second holder polling alone. The DEV WALLET MOVE signal requires pro.
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:3000.
+
+**What works on free plan vs pro plan**
+
+On the free plan: holder polling every 60 seconds, risk checks, token price, and proxy wallet trading all work. The DEV WALLET MOVE signal (real-time WebSocket detection) requires the pro plan. Set API_PLAN=free in .env and the tx listener is skipped automatically with a log message.
+
+**To open a position from the UI**
+
+You need the token contract address and the DEX pair address. Both are visible on DEX Screener or Birdeye for any token. Enter them in the form, pick your chain, set your USD amount, and click open. VANE runs a honeypot check before placing the order. If the token is flagged as a honeypot or CRITICAL risk, the order is blocked.
 
 <br/>
 

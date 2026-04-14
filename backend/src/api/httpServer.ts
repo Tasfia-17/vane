@@ -2,10 +2,37 @@ import http from 'http'
 import { EventEmitter } from 'eventemitter3'
 import { getOpenPositions, insertPosition, closePosition } from '../db/queries'
 import { getRisk, getTokenPrice } from '../api/dataClient'
-import { createSwapOrder } from '../api/tradeClient'
+import { createSwapOrder, cancelOrder } from '../api/tradeClient'
 import { registerDevWallet } from '../services/scoreManager'
 import { config } from '../config'
-import type { BusEvents, Position, WsMessage } from '../types'
+import type { BusEvents, Position } from '../types'
+
+const NATIVE_ADDRESS: Record<string, string> = {
+  solana: 'sol',
+  eth: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+  bsc: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+  base: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+}
+
+const NATIVE_DECIMALS: Record<string, number> = {
+  solana: 9, eth: 18, bsc: 18, base: 18,
+}
+
+// Fetch native token price to convert USD -> native units for buy orders
+async function getNativePrice(chain: string): Promise<number> {
+  const nativeTokens: Record<string, string> = {
+    solana: 'So11111111111111111111111111111111111111112',
+    eth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    bsc: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+    base: '0x4200000000000000000000000000000000000006',
+  }
+  try {
+    return await getTokenPrice(nativeTokens[chain] ?? '', chain)
+  } catch {
+    const fallback: Record<string, number> = { solana: 140, eth: 3000, bsc: 600, base: 3000 }
+    return fallback[chain] ?? 1
+  }
+}
 
 function json(res: http.ServerResponse, status: number, data: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
@@ -34,18 +61,15 @@ export function startHttpServer(
     }
 
     try {
-      // GET /health
       if (req.method === 'GET' && url.pathname === '/health') {
         return json(res, 200, { ok: true, positions: positions.size })
       }
 
-      // GET /positions
       if (req.method === 'GET' && url.pathname === '/positions') {
         const rows = await getOpenPositions()
         return json(res, 200, rows)
       }
 
-      // POST /positions — open a new position
       if (req.method === 'POST' && url.pathname === '/positions') {
         const body = await readBody(req) as {
           tokenAddress: string
@@ -54,34 +78,38 @@ export function startHttpServer(
           inAmountUsd: number
         }
 
-        // 1. Risk check
-        const risk = await getRisk(body.tokenAddress, body.chain)
-        if (risk.honeypot) return json(res, 400, { error: 'Token is a honeypot — cannot open position' })
-        if (risk.risk_level === 'CRITICAL') return json(res, 400, { error: `Token risk is CRITICAL (score: ${risk.risk_score})` })
+        if (!body.tokenAddress || !body.pairAddress || !body.chain || !body.inAmountUsd) {
+          return json(res, 400, { error: 'tokenAddress, pairAddress, chain, inAmountUsd are required' })
+        }
 
-        // Register dev wallet from risk data
+        const risk = await getRisk(body.tokenAddress, body.chain)
+        if (risk.honeypot) return json(res, 400, { error: 'Token is a honeypot' })
+        if (risk.risk_level === 'CRITICAL') return json(res, 400, { error: `Token risk is CRITICAL (score: ${risk.risk_score})` })
         if (risk.owner) registerDevWallet(body.tokenAddress, risk.owner)
 
-        // 2. Get current price
         const entryPrice = await getTokenPrice(body.tokenAddress, body.chain)
 
-        // 3. Create proxy wallet order with default stops
-        const inAmountLamports = String(Math.round(body.inAmountUsd * 1e6))
+        // inAmount = native token units we spend (SOL lamports, ETH wei)
+        const nativePrice = await getNativePrice(body.chain)
+        const nativeAmount = body.inAmountUsd / nativePrice
+        const decimals = NATIVE_DECIMALS[body.chain] ?? 18
+        const inAmount = String(Math.round(nativeAmount * Math.pow(10, decimals)))
+        const native = NATIVE_ADDRESS[body.chain] ?? 'sol'
+
         const orderId = await createSwapOrder({
           chain: body.chain,
-          inTokenAddress: 'sol',
+          inTokenAddress: native,
           outTokenAddress: body.tokenAddress,
-          inAmount: inAmountLamports,
+          inAmount,
           swapType: 'buy',
           autoSellConfig: [
-            { priceChange: '-2000', sellRatio: '10000', type: 'default' },   // -20% stop loss
-            { priceChange: '5000', sellRatio: '5000', type: 'default' },     // +50% take 50%
-            { priceChange: '10000', sellRatio: '5000', type: 'default' },    // +100% take rest
-            { priceChange: '2000', sellRatio: '10000', type: 'trailing' },   // 20% trailing
+            { priceChange: '-2000', sellRatio: '10000', type: 'default' },
+            { priceChange: '5000',  sellRatio: '5000',  type: 'default' },
+            { priceChange: '10000', sellRatio: '5000',  type: 'default' },
+            { priceChange: '2000',  sellRatio: '10000', type: 'trailing' },
           ],
         })
 
-        // 4. Save to DB
         const pos = await insertPosition({
           tokenAddress: body.tokenAddress,
           pairAddress: body.pairAddress,
@@ -97,16 +125,13 @@ export function startHttpServer(
         return json(res, 201, pos)
       }
 
-      // DELETE /positions/:id — close position manually
       if (req.method === 'DELETE' && url.pathname.startsWith('/positions/')) {
         const id = url.pathname.split('/')[2]
         const pos = positions.get(id)
         if (!pos) return json(res, 404, { error: 'Position not found' })
 
-        // Cancel AVE order if one exists
         if (pos.orderId) {
-          try { await (await import('../api/tradeClient')).cancelOrder(pos.chain, pos.orderId) }
-          catch { /* order may already be filled */ }
+          try { await cancelOrder(pos.chain, pos.orderId) } catch { /* already filled */ }
         }
 
         await closePosition(id)
