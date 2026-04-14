@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" width="860" height="300" font-family="'SF Mono','Fira Code','Courier New',monospace">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/></filter>
+    <marker id="a" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#475569"/>
+    </marker>
+    <marker id="ag" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#10b981"/>
+    </marker>
+    <marker id="ar" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <rect width="860" height="300" fill="url(#bg)" rx="10"/>
+  <rect width="860" height="300" fill="none" stroke="#1e293b" stroke-width="1.5" rx="10"/>
+  <text x="430" y="26" font-size="11" fill="#64748b" text-anchor="middle" letter-spacing="3">STOP ADJUSTMENT LIFECYCLE</text>
+
+  <!-- Timeline line -->
+  <line x1="60" y1="130" x2="800" y2="130" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Time markers -->
+  <text x="60" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+0</text>
+  <text x="200" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+60s</text>
+  <text x="340" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+120s</text>
+  <text x="480" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+180s</text>
+  <text x="620" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+240s</text>
+  <text x="760" y="148" font-size="7.5" fill="#475569" text-anchor="middle">T+300s</text>
+
+  <!-- Tick marks -->
+  <line x1="60" y1="126" x2="60" y2="134" stroke="#334155" stroke-width="1.5"/>
+  <line x1="200" y1="126" x2="200" y2="134" stroke="#334155" stroke-width="1.5"/>
+  <line x1="340" y1="126" x2="340" y2="134" stroke="#334155" stroke-width="1.5"/>
+  <line x1="480" y1="126" x2="480" y2="134" stroke="#334155" stroke-width="1.5"/>
+  <line x1="620" y1="126" x2="620" y2="134" stroke="#334155" stroke-width="1.5"/>
+  <line x1="760" y1="126" x2="760" y2="134" stroke="#334155" stroke-width="1.5"/>
+
+  <!-- Event 1: Position opened -->
+  <line x1="60" y1="130" x2="60" y2="90" stroke="#10b981" stroke-width="1.5"/>
+  <g filter="url(#s)">
+    <rect x="20" y="55" width="80" height="34" rx="5" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+  </g>
+  <text x="60" y="70" font-size="7.5" fill="#6ee7b7" text-anchor="middle">Position</text>
+  <text x="60" y="82" font-size="7.5" fill="#6ee7b7" text-anchor="middle">opened</text>
+  <text x="60" y="96" font-size="6.5" fill="#10b981" text-anchor="middle">default stops set</text>
+  <text x="60" y="106" font-size="6.5" fill="#475569" text-anchor="middle">SL -20% TP +50%</text>
+
+  <!-- Event 2: First poll, NORMAL -->
+  <line x1="200" y1="130" x2="200" y2="90" stroke="#475569" stroke-width="1.5"/>
+  <g filter="url(#s)">
+    <rect x="160" y="55" width="80" height="34" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+  </g>
+  <text x="200" y="70" font-size="7.5" fill="#94a3b8" text-anchor="middle">Poll 1</text>
+  <text x="200" y="82" font-size="7.5" fill="#94a3b8" text-anchor="middle">NORMAL</text>
+  <text x="200" y="96" font-size="6.5" fill="#64748b" text-anchor="middle">score 38</text>
+  <text x="200" y="106" font-size="6.5" fill="#475569" text-anchor="middle">no change</text>
+
+  <!-- Event 3: Whale sell detected, ALERT -->
+  <line x1="340" y1="130" x2="340" y2="90" stroke="#f59e0b" stroke-width="1.5"/>
+  <g filter="url(#s)">
+    <rect x="300" y="55" width="80" height="34" rx="5" fill="#1c1400" stroke="#f59e0b" stroke-width="1.5"/>
+  </g>
+  <text x="340" y="70" font-size="7.5" fill="#fcd34d" text-anchor="middle">Poll 2</text>
+  <text x="340" y="82" font-size="7.5" fill="#fcd34d" text-anchor="middle">ALERT</text>
+  <text x="340" y="96" font-size="6.5" fill="#f59e0b" text-anchor="middle">score 58, whale sell</text>
+  <text x="340" y="106" font-size="6.5" fill="#f59e0b" text-anchor="middle">stop tightens 30%</text>
+
+  <!-- Event 4: Multi-whale, WARNING -->
+  <line x1="480" y1="130" x2="480" y2="90" stroke="#f97316" stroke-width="1.5"/>
+  <g filter="url(#s)">
+    <rect x="440" y="55" width="80" height="34" rx="5" fill="#1c0a00" stroke="#f97316" stroke-width="1.5"/>
+  </g>
+  <text x="480" y="70" font-size="7.5" fill="#fdba74" text-anchor="middle">Poll 3</text>
+  <text x="480" y="82" font-size="7.5" fill="#fdba74" text-anchor="middle">WARNING</text>
+  <text x="480" y="96" font-size="6.5" fill="#f97316" text-anchor="middle">score 74, 3 whales</text>
+  <text x="480" y="106" font-size="6.5" fill="#f97316" text-anchor="middle">stop tightens 50%</text>
+
+  <!-- Event 5: Dev wallet move, CRITICAL -->
+  <line x1="620" y1="130" x2="620" y2="90" stroke="#ef4444" stroke-width="2"/>
+  <g filter="url(#s)">
+    <rect x="575" y="55" width="90" height="34" rx="5" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+  </g>
+  <text x="620" y="70" font-size="7.5" fill="#fca5a5" text-anchor="middle">WS event</text>
+  <text x="620" y="82" font-size="7.5" fill="#fca5a5" text-anchor="middle">CRITICAL</text>
+  <text x="620" y="96" font-size="6.5" fill="#ef4444" text-anchor="middle">dev wallet to DEX</text>
+  <text x="620" y="106" font-size="6.5" fill="#ef4444" text-anchor="middle">HARD EXIT fires</text>
+
+  <!-- Event 6: Position closed -->
+  <line x1="760" y1="130" x2="760" y2="90" stroke="#64748b" stroke-width="1.5"/>
+  <g filter="url(#s)">
+    <rect x="720" y="55" width="80" height="34" rx="5" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="760" y="70" font-size="7.5" fill="#94a3b8" text-anchor="middle">Position</text>
+  <text x="760" y="82" font-size="7.5" fill="#94a3b8" text-anchor="middle">closed</text>
+  <text x="760" y="96" font-size="6.5" fill="#64748b" text-anchor="middle">removed from memory</text>
+  <text x="760" y="106" font-size="6.5" fill="#64748b" text-anchor="middle">poller stops watching</text>
+
+  <!-- Stop level visualization -->
+  <text x="430" y="175" font-size="9" fill="#475569" text-anchor="middle" letter-spacing="2">STOP LEVEL OVER TIME</text>
+
+  <!-- Stop level chart -->
+  <rect x="60" y="185" width="740" height="80" rx="5" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Y axis labels -->
+  <text x="55" y="200" font-size="7" fill="#475569" text-anchor="end">-14%</text>
+  <text x="55" y="220" font-size="7" fill="#475569" text-anchor="end">-20%</text>
+  <text x="55" y="240" font-size="7" fill="#475569" text-anchor="end">-28%</text>
+  <text x="55" y="258" font-size="7" fill="#475569" text-anchor="end">-40%</text>
+
+  <!-- Grid lines -->
+  <line x1="60" y1="200" x2="800" y2="200" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="60" y1="220" x2="800" y2="220" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="60" y1="240" x2="800" y2="240" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="60" y1="258" x2="800" y2="258" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- Stop level line: starts at -20%, tightens at ALERT, tightens more at WARNING, exits at CRITICAL -->
+  <!-- T+0 to T+120s: -20% (y=220) -->
+  <polyline points="60,220 200,220 340,220" fill="none" stroke="#10b981" stroke-width="2"/>
+  <!-- T+120s to T+180s: tightens to -14% (y=200) -->
+  <polyline points="340,220 340,200 480,200" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <!-- T+180s to T+240s: tightens to -10% (y=190) -->
+  <polyline points="480,200 480,192 620,192" fill="none" stroke="#f97316" stroke-width="2"/>
+  <!-- T+240s: hard exit -->
+  <line x1="620" y1="192" x2="620" y2="265" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 2"/>
+
+  <!-- Dots at events -->
+  <circle cx="60" cy="220" r="4" fill="#10b981"/>
+  <circle cx="200" cy="220" r="4" fill="#475569"/>
+  <circle cx="340" cy="220" r="4" fill="#f59e0b"/>
+  <circle cx="480" cy="200" r="4" fill="#f97316"/>
+  <circle cx="620" cy="192" r="4" fill="#ef4444"/>
+
+  <!-- Exit marker -->
+  <text x="620" y="278" font-size="8" fill="#ef4444" text-anchor="middle">EXIT</text>
+</svg>

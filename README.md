@@ -64,6 +64,36 @@ The backend is a Node.js TypeScript process with an internal event bus. The hold
 
 <br/>
 
+## Signal Detection Flow
+
+<p align="center">
+  <img src="signal-flow.svg" width="100%" alt="Signal detection and execution flow"/>
+</p>
+
+When a position is opened, VANE registers the developer wallet from the risk API and starts two parallel monitoring paths. The holder poller runs every 60 seconds and computes balance deltas across the top 100 holders. The WebSocket listener catches every swap transaction in real time. Both paths feed the signal engine. The score manager only acts when the mode changes, preventing redundant order cancellations. RELAXED through WARNING modes adjust the stop. CRITICAL fires a hard exit and removes the position from memory so the poller stops watching it.
+
+<br/>
+
+## Danger Score Modes
+
+<p align="center">
+  <img src="danger-score.svg" width="100%" alt="Danger score modes and stop behavior"/>
+</p>
+
+The score is computed fresh on every snapshot from a neutral baseline of 50. It does not accumulate across polls. If whales stop selling, the score comes back down. This prevents the system from getting stuck in a high-danger state after a single event that does not repeat.
+
+<br/>
+
+## Stop Adjustment Over Time
+
+<p align="center">
+  <img src="stop-lifecycle.svg" width="100%" alt="Stop level lifecycle over a position"/>
+</p>
+
+This shows a typical position lifecycle. The stop starts at the default level. As whale selling is detected across successive polls, the stop tightens progressively. When the developer wallet moves tokens to a DEX, detected in real time via WebSocket, the hard exit fires immediately regardless of the current price. The position is closed in the database and removed from the in-memory map so no further polling occurs.
+
+<br/>
+
 ## AVE Claw Integration
 
 VANE uses both skill tracks required for the Complete Application category.

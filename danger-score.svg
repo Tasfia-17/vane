@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 200" width="860" height="200" font-family="'SF Mono','Fira Code','Courier New',monospace">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/></filter>
+    <marker id="a" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect width="860" height="200" fill="url(#bg)" rx="10"/>
+  <rect width="860" height="200" fill="none" stroke="#1e293b" stroke-width="1.5" rx="10"/>
+  <text x="430" y="26" font-size="11" fill="#64748b" text-anchor="middle" letter-spacing="3">DANGER SCORE MODES AND STOP BEHAVIOR</text>
+
+  <!-- Score bar background -->
+  <rect x="40" y="50" width="780" height="28" rx="5" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Score segments -->
+  <rect x="40" y="50" width="156" height="28" rx="5" fill="#10b981" opacity="0.25"/>
+  <rect x="196" y="50" width="156" height="28" fill="#475569" opacity="0.2"/>
+  <rect x="352" y="50" width="156" height="28" fill="#f59e0b" opacity="0.25"/>
+  <rect x="508" y="50" width="156" height="28" fill="#f97316" opacity="0.25"/>
+  <rect x="664" y="50" width="156" height="28" rx="5" fill="#ef4444" opacity="0.3"/>
+
+  <!-- Segment labels -->
+  <text x="118" y="69" font-size="10" fill="#10b981" text-anchor="middle" font-weight="bold">RELAXED</text>
+  <text x="274" y="69" font-size="10" fill="#94a3b8" text-anchor="middle" font-weight="bold">NORMAL</text>
+  <text x="430" y="69" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="bold">ALERT</text>
+  <text x="586" y="69" font-size="10" fill="#f97316" text-anchor="middle" font-weight="bold">WARNING</text>
+  <text x="742" y="69" font-size="10" fill="#ef4444" text-anchor="middle" font-weight="bold">CRITICAL</text>
+
+  <!-- Score range labels -->
+  <text x="118" y="44" font-size="8" fill="#10b981" text-anchor="middle">0 to 20</text>
+  <text x="274" y="44" font-size="8" fill="#64748b" text-anchor="middle">21 to 40</text>
+  <text x="430" y="44" font-size="8" fill="#f59e0b" text-anchor="middle">41 to 60</text>
+  <text x="586" y="44" font-size="8" fill="#f97316" text-anchor="middle">61 to 80</text>
+  <text x="742" y="44" font-size="8" fill="#ef4444" text-anchor="middle">81 to 100</text>
+
+  <!-- Dividers -->
+  <line x1="196" y1="50" x2="196" y2="78" stroke="#1e293b" stroke-width="2"/>
+  <line x1="352" y1="50" x2="352" y2="78" stroke="#1e293b" stroke-width="2"/>
+  <line x1="508" y1="50" x2="508" y2="78" stroke="#1e293b" stroke-width="2"/>
+  <line x1="664" y1="50" x2="664" y2="78" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Stop behavior boxes -->
+  <g filter="url(#s)">
+    <rect x="40" y="110" width="156" height="60" rx="6" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+  </g>
+  <text x="118" y="130" font-size="8.5" fill="#6ee7b7" text-anchor="middle">Stop widens 20%</text>
+  <text x="118" y="145" font-size="7.5" fill="#34d399" text-anchor="middle">Whales accumulating</text>
+  <text x="118" y="160" font-size="7" fill="#475569" text-anchor="middle">hold the position</text>
+
+  <g filter="url(#s)">
+    <rect x="196" y="110" width="156" height="60" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+  </g>
+  <text x="274" y="130" font-size="8.5" fill="#94a3b8" text-anchor="middle">No change</text>
+  <text x="274" y="145" font-size="7.5" fill="#64748b" text-anchor="middle">Neutral signals</text>
+  <text x="274" y="160" font-size="7" fill="#475569" text-anchor="middle">watch and wait</text>
+
+  <g filter="url(#s)">
+    <rect x="352" y="110" width="156" height="60" rx="6" fill="#1c1400" stroke="#f59e0b" stroke-width="1.5"/>
+  </g>
+  <text x="430" y="130" font-size="8.5" fill="#fcd34d" text-anchor="middle">Stop tightens 30%</text>
+  <text x="430" y="145" font-size="7.5" fill="#fbbf24" text-anchor="middle">Whale selling detected</text>
+  <text x="430" y="160" font-size="7" fill="#475569" text-anchor="middle">reduce exposure</text>
+
+  <g filter="url(#s)">
+    <rect x="508" y="110" width="156" height="60" rx="6" fill="#1c0a00" stroke="#f97316" stroke-width="1.5"/>
+  </g>
+  <text x="586" y="130" font-size="8.5" fill="#fdba74" text-anchor="middle">Stop tightens 50%</text>
+  <text x="586" y="145" font-size="7.5" fill="#fb923c" text-anchor="middle">Multi-whale confluence</text>
+  <text x="586" y="160" font-size="7" fill="#475569" text-anchor="middle">exit imminent</text>
+
+  <g filter="url(#s)">
+    <rect x="664" y="110" width="156" height="60" rx="6" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+  </g>
+  <text x="742" y="130" font-size="8.5" fill="#fca5a5" text-anchor="middle">HARD EXIT</text>
+  <text x="742" y="145" font-size="7.5" fill="#f87171" text-anchor="middle">Dev wallet move detected</text>
+  <text x="742" y="160" font-size="7" fill="#ef4444" text-anchor="middle">15% slippage, get out now</text>
+
+  <!-- Connector lines -->
+  <line x1="118" y1="78" x2="118" y2="108" stroke="#10b981" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="274" y1="78" x2="274" y2="108" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="430" y1="78" x2="430" y2="108" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="586" y1="78" x2="586" y2="108" stroke="#f97316" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="742" y1="78" x2="742" y2="108" stroke="#ef4444" stroke-width="1.5" marker-end="url(#a)"/>
+</svg>
