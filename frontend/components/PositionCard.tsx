@@ -1,4 +1,5 @@
 'use client'
+import { useMemo } from 'react'
 import { useStore } from '@/store/useStore'
 import type { Position } from '@/lib/types'
 import { DangerGauge } from './DangerGauge'
@@ -19,10 +20,14 @@ const MODE_BORDER: Record<string, string> = {
 
 export function PositionCard({ position, onClose }: Props) {
   const score = useStore(s => s.scores[position.id])
-  const holders = useStore(s => s.holders[position.tokenAddress] ?? [])
+  const holders = useStore(s => s.holders[position.tokenAddress])
   const holderCount = useStore(s => s.holderCounts[position.tokenAddress] ?? 0)
   const top10Pct = useStore(s => s.top10Pcts[position.tokenAddress] ?? 0)
-  const events = useStore(s => s.events.filter(e => e.positionId === position.id))
+  const allEvents = useStore(s => s.events)
+  const events = useMemo(
+    () => allEvents.filter(e => e.positionId === position.id),
+    [allEvents, position.id]
+  )
 
   const borderClass = score ? (MODE_BORDER[score.mode] ?? 'border-slate-600') : 'border-slate-600'
 
@@ -53,7 +58,7 @@ export function PositionCard({ position, onClose }: Props) {
       <DangerGauge score={score} />
 
       {/* Holder table */}
-      {holders.length > 0 && (
+      {holders && holders.length > 0 && (
         <HolderTable holders={holders} top10Pct={top10Pct} holderCount={holderCount} />
       )}
 
