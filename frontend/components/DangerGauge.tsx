@@ -1,81 +1,102 @@
 'use client'
 import type { DangerScore } from '@/lib/types'
 
-const MODE_COLORS: Record<DangerScore['mode'], string> = {
-  RELAXED:  'text-emerald-400',
-  NORMAL:   'text-slate-300',
-  ALERT:    'text-yellow-400',
-  WARNING:  'text-orange-400',
-  CRITICAL: 'text-red-500',
+const MODE_CONFIG: Record<DangerScore['mode'], {
+  color: string; bg: string; bar: string; glow: string; label: string; stopHint: string
+}> = {
+  RELAXED:  { color: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/25', bar: 'bg-emerald-500', glow: 'glow-green', label: 'RELAXED', stopHint: 'Stop widened +20%' },
+  NORMAL:   { color: 'text-slate-300',   bg: 'bg-slate-500/8 border-slate-500/25',     bar: 'bg-slate-400',   glow: '',           label: 'NORMAL',  stopHint: 'Stop unchanged' },
+  ALERT:    { color: 'text-yellow-400',  bg: 'bg-yellow-500/8 border-yellow-500/30',   bar: 'bg-yellow-500',  glow: 'glow-yellow', label: 'ALERT',   stopHint: 'Stop tightened 30%' },
+  WARNING:  { color: 'text-orange-400',  bg: 'bg-orange-500/8 border-orange-500/30',   bar: 'bg-orange-500',  glow: 'glow-orange', label: 'WARNING', stopHint: 'Stop tightened 50%' },
+  CRITICAL: { color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/60',        bar: 'bg-red-500',     glow: 'glow-red',    label: 'CRITICAL', stopHint: 'HARD EXIT triggered' },
 }
 
-const MODE_BG: Record<DangerScore['mode'], string> = {
-  RELAXED:  'bg-emerald-500/20 border-emerald-500/40',
-  NORMAL:   'bg-slate-500/20 border-slate-500/40',
-  ALERT:    'bg-yellow-500/20 border-yellow-500/40',
-  WARNING:  'bg-orange-500/20 border-orange-500/40',
-  CRITICAL: 'bg-red-500/20 border-red-500/40 animate-pulse',
+const SIGNAL_ICONS: Record<string, string> = {
+  WHALE_SELL:        '🐋',
+  MULTI_WHALE_SELL:  '🌊',
+  DEV_WALLET_MOVE:   '🚨',
+  HOLDER_COUNT_DROP: '📉',
+  WHALE_BUY:         '🟢',
+  NEW_WHALE_ENTRY:   '🔵',
 }
 
-const STOP_HINT: Record<DangerScore['mode'], string> = {
-  RELAXED:  'Stop widened +20%',
-  NORMAL:   'Stop unchanged',
-  ALERT:    'Stop tightened 30%',
-  WARNING:  'Stop tightened 50%',
-  CRITICAL: 'HARD EXIT triggered',
-}
-
-interface Props {
-  score: DangerScore | undefined
-}
+interface Props { score: DangerScore | undefined }
 
 export function DangerGauge({ score }: Props) {
   if (!score) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-4">
-        <div className="text-slate-500 text-sm">Waiting for first snapshot…</div>
+      <div className="glass rounded-2xl p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
+          <span className="text-xs font-mono text-slate-500 tracking-widest uppercase">Danger Score</span>
+        </div>
+        <div className="h-1.5 bg-slate-800 rounded-full mb-4" />
+        <p className="text-slate-600 text-sm">Waiting for first holder snapshot...</p>
       </div>
     )
   }
 
+  const cfg = MODE_CONFIG[score.mode]
   const pct = score.score
-  const color = MODE_COLORS[score.mode]
-  const bg = MODE_BG[score.mode]
+  const isCritical = score.mode === 'CRITICAL'
 
   return (
-    <div className={`rounded-xl border p-4 ${bg}`}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Danger Score</span>
-        <span className={`text-xs font-semibold ${color}`}>{score.mode}</span>
+    <div className={`rounded-2xl border p-5 transition-all duration-500 ${cfg.bg} ${cfg.glow} ${isCritical ? 'critical-pulse' : ''}`}>
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${cfg.bar} ${isCritical ? 'animate-ping' : ''}`} />
+          <span className="text-xs font-mono text-slate-400 tracking-widest uppercase">Danger Score</span>
+        </div>
+        <div className={`text-xs font-bold tracking-widest px-2.5 py-1 rounded-full border ${cfg.color} ${cfg.bg}`}>
+          {cfg.label}
+        </div>
       </div>
 
-      {/* Score bar */}
-      <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden mb-3">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${
-            pct <= 20 ? 'bg-emerald-500' :
-            pct <= 40 ? 'bg-slate-400' :
-            pct <= 60 ? 'bg-yellow-500' :
-            pct <= 80 ? 'bg-orange-500' : 'bg-red-500'
-          }`}
-          style={{ width: `${pct}%` }}
-        />
+      {/* Score number + bar */}
+      <div className="flex items-end gap-4 mb-3">
+        <span className={`text-5xl font-black tabular-nums leading-none score-flash ${cfg.color}`}>
+          {pct}
+        </span>
+        <div className="flex-1 pb-2">
+          <div className="flex justify-between text-xs text-slate-600 mb-1.5">
+            <span>0</span>
+            <span className="text-slate-500">{cfg.stopHint}</span>
+            <span>100</span>
+          </div>
+          <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden">
+            {/* Track segments */}
+            <div className="absolute inset-0 flex">
+              <div className="flex-1 border-r border-slate-700/50" />
+              <div className="flex-1 border-r border-slate-700/50" />
+              <div className="flex-1 border-r border-slate-700/50" />
+              <div className="flex-1 border-r border-slate-700/50" />
+              <div className="flex-1" />
+            </div>
+            <div
+              className={`absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out ${cfg.bar}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-end justify-between mb-3">
-        <span className={`text-3xl font-bold tabular-nums ${color}`}>{pct}</span>
-        <span className="text-xs text-slate-500">{STOP_HINT[score.mode]}</span>
-      </div>
-
-      {/* Signal breakdown */}
+      {/* Signals */}
       {score.signals.length > 0 && (
-        <div className="space-y-1 mt-3 border-t border-slate-700/50 pt-3">
+        <div className="mt-4 space-y-2 border-t border-slate-700/40 pt-4">
+          <p className="text-xs text-slate-500 font-mono tracking-widest uppercase mb-2">Active Signals</p>
           {score.signals.map((sig, i) => (
-            <div key={i} className="flex items-start gap-2 text-xs">
-              <span className={sig.weight > 0 ? 'text-red-400' : 'text-emerald-400'}>
-                {sig.weight > 0 ? '▲' : '▼'}
-              </span>
-              <span className="text-slate-300 leading-tight">{sig.detail}</span>
+            <div key={i} className="slide-in flex items-start gap-2.5 bg-slate-800/50 rounded-xl px-3 py-2.5">
+              <span className="text-base leading-none mt-0.5">{SIGNAL_ICONS[sig.type] ?? '●'}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className={`text-xs font-semibold ${sig.weight > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                    {sig.weight > 0 ? `+${sig.weight}` : sig.weight}
+                  </span>
+                  <span className="text-xs font-mono text-slate-500">{sig.type.replace(/_/g, ' ')}</span>
+                </div>
+                <p className="text-xs text-slate-300 leading-snug">{sig.detail}</p>
+              </div>
             </div>
           ))}
         </div>
