@@ -30,7 +30,7 @@ function timeAgo(date: string | Date) {
 
 export function PositionCard({ position, onClose }: Props) {
   const score = useStore(s => s.scores[position.id])
-  const scoreHistory = useStore(s => s.scoreHistory[position.id] ?? [])
+  const scoreHistory = useStore(s => s.scoreHistory[position.id])
   const holders = useStore(s => s.holders[position.tokenAddress])
   const holderCount = useStore(s => s.holderCounts[position.tokenAddress] ?? 0)
   const top10Pct = useStore(s => s.top10Pcts[position.tokenAddress] ?? 0)
@@ -71,7 +71,7 @@ export function PositionCard({ position, onClose }: Props) {
 
         <div className="flex items-center gap-4">
           {/* Score sparkline */}
-          {scoreHistory.length >= 2 && (
+          {scoreHistory && scoreHistory.length >= 2 && (
             <div className="flex flex-col items-end gap-1">
               <span className="text-xs text-slate-600 font-mono">score trend</span>
               <ScoreSparkline history={scoreHistory} />
