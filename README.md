@@ -219,5 +219,4 @@ vane/
 
 ## Contact
 
-Built for AVE Claw Hackathon 2026, part of Hong Kong Web3 Festival.
-Submission deadline: April 15, 2026.
+
