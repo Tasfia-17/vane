@@ -1,6 +1,24 @@
 import { pool } from './schema'
 import type { Position, HolderSnapshot, DangerScore, Chain } from '../types'
 
+export { pool }
+
+export function rowToPosition(row: Record<string, unknown>): Position {
+  return {
+    id: row.id as string,
+    tokenAddress: row.token_address as string,
+    pairAddress: row.pair_address as string,
+    chain: row.chain as Chain,
+    entryPrice: parseFloat(row.entry_price as string),
+    size: parseFloat(row.size as string),
+    sizeUsd: parseFloat(row.size_usd as string),
+    status: row.status as 'open' | 'closed',
+    orderId: row.order_id as string | undefined,
+    openedAt: row.opened_at as Date,
+    closedAt: row.closed_at as Date | undefined,
+  }
+}
+
 export async function insertPosition(p: Omit<Position, 'id' | 'openedAt'>): Promise<Position> {
   const { rows } = await pool.query(
     `INSERT INTO positions (token_address, pair_address, chain, entry_price, size, size_usd, order_id)
@@ -52,20 +70,4 @@ export async function insertTradeExecution(params: {
      VALUES ($1,$2,$3,$4,$5)`,
     [params.positionId, params.signalId ?? null, params.direction, params.txHash ?? null, params.status]
   )
-}
-
-function rowToPosition(row: Record<string, unknown>): Position {
-  return {
-    id: row.id as string,
-    tokenAddress: row.token_address as string,
-    pairAddress: row.pair_address as string,
-    chain: row.chain as Chain,
-    entryPrice: parseFloat(row.entry_price as string),
-    size: parseFloat(row.size as string),
-    sizeUsd: parseFloat(row.size_usd as string),
-    status: row.status as 'open' | 'closed',
-    orderId: row.order_id as string | undefined,
-    openedAt: row.opened_at as Date,
-    closedAt: row.closed_at as Date | undefined,
-  }
 }

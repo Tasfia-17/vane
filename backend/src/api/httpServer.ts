@@ -1,6 +1,6 @@
 import http from 'http'
 import { EventEmitter } from 'eventemitter3'
-import { getOpenPositions, insertPosition, closePosition } from '../db/queries'
+import { getOpenPositions, insertPosition, closePosition, pool, rowToPosition } from '../db/queries'
 import { getRisk, getTokenPrice } from '../api/dataClient'
 import { createSwapOrder, cancelOrder } from '../api/tradeClient'
 import { registerDevWallet } from '../services/scoreManager'
@@ -66,7 +66,10 @@ export function startHttpServer(
       }
 
       if (req.method === 'GET' && url.pathname === '/positions') {
-        const rows = await getOpenPositions()
+        const status = url.searchParams.get('status') ?? 'open'
+        const rows = status === 'closed'
+          ? await pool.query(`SELECT * FROM positions WHERE status='closed' ORDER BY closed_at DESC LIMIT 100`).then(r => r.rows.map(rowToPosition))
+          : await getOpenPositions()
         return json(res, 200, rows)
       }
 

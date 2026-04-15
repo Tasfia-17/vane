@@ -1,5 +1,6 @@
 'use client'
 import { useMemo } from 'react'
+import Link from 'next/link'
 import { useStore } from '@/store/useStore'
 import type { Position } from '@/lib/types'
 import { DangerGauge } from './DangerGauge'
@@ -93,6 +94,12 @@ export function PositionCard({ position, onClose }: Props) {
           >
             Close
           </button>
+          <Link
+            href={`/positions/${position.id}`}
+            className="px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-500 hover:border-slate-500 hover:text-slate-300 transition-all"
+          >
+            Details
+          </Link>
         </div>
       </div>
 

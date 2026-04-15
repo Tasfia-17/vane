@@ -7,33 +7,33 @@ import { startTxListener } from './services/txListener'
 import { startScoreManager } from './services/scoreManager'
 import { startWsServer } from './ws/server'
 import { startHttpServer } from './api/httpServer'
+import { config } from './config'
 import type { BusEvents, Position } from './types'
 
 async function main() {
+  if (process.env.DEMO_MODE === 'true') {
+    const { startDemoServer } = await import('./demo')
+    startDemoServer()
+    return
+  }
+
   console.log('🌬️  VANE starting...')
 
-  // Init DB
   await initDb()
   console.log('[DB] Schema ready')
 
-  // Load existing open positions into memory
   const positions = new Map<string, Position>()
   const existing = await getOpenPositions()
   for (const p of existing) positions.set(p.id, p)
   console.log(`[DB] Loaded ${positions.size} open positions`)
 
-  // Internal event bus
   const bus = new EventEmitter<BusEvents>()
-
-  // Accessor for current positions (services call this to get live state)
   const getPositions = () => Array.from(positions.values())
 
-  // Start all services
   startScoreManager(bus, getPositions, (id) => positions.delete(id))
   startHolderPoller(bus, getPositions)
 
-  // Only start WebSocket tx listener on pro plan
-  if (process.env.API_PLAN === 'pro') {
+  if (config.apiPlan === 'pro') {
     startTxListener(bus, getPositions)
   } else {
     console.log('[TxListener] Skipped — requires pro API plan')
