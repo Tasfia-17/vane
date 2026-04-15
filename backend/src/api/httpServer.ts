@@ -65,6 +65,44 @@ export function startHttpServer(
         return json(res, 200, { ok: true, positions: positions.size })
       }
 
+      // GET /backtest/:tokenAddress/:chain — replay stored holder snapshots to show signal history
+      if (req.method === 'GET' && url.pathname.startsWith('/backtest/')) {
+        const [, , tokenAddress, chain] = url.pathname.split('/')
+        if (!tokenAddress || !chain) return json(res, 400, { error: 'tokenAddress and chain required' })
+
+        const { rows } = await pool.query(
+          `SELECT holder_count, top10_pct, holders_json, snapshotted_at
+           FROM holder_snapshots
+           WHERE token_address = $1 AND chain = $2
+           ORDER BY snapshotted_at ASC
+           LIMIT 50`,
+          [tokenAddress, chain]
+        )
+
+        // Replay snapshots through signal engine to reconstruct score history
+        const { scoreFromSnapshot } = await import('../engine/signalEngine')
+        const replayId = `backtest-${tokenAddress}`
+        const history = rows.map((row: Record<string, unknown>) => {
+          const snap = {
+            tokenAddress,
+            chain: chain as import('../types').Chain,
+            holders: row.holders_json as import('../types').Holder[],
+            top10Pct: parseFloat(row.top10_pct as string),
+            holderCount: row.holder_count as number,
+            snapshotAt: row.snapshotted_at as Date,
+          }
+          const score = scoreFromSnapshot(replayId, snap)
+          return {
+            time: snap.snapshotAt,
+            score: score.score,
+            mode: score.mode,
+            signals: score.signals,
+          }
+        })
+
+        return json(res, 200, { tokenAddress, chain, snapshots: history.length, history })
+      }
+
       if (req.method === 'GET' && url.pathname === '/positions') {
         const status = url.searchParams.get('status') ?? 'open'
         const rows = status === 'closed'

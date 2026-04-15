@@ -12,8 +12,13 @@ import type { BusEvents, Position } from './types'
 
 async function main() {
   if (process.env.DEMO_MODE === 'true') {
-    const { startDemoServer } = await import('./demo')
-    startDemoServer()
+    try {
+      const { startDemoServer } = await import('./demo')
+      startDemoServer()
+    } catch {
+      console.error('Demo mode requires demo.ts — not available in production build')
+      process.exit(1)
+    }
     return
   }
 

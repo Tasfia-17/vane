@@ -119,6 +119,7 @@ export default function PositionDetail() {
                   <span>oldest</span>
                   <span>now: <span className="text-slate-300 font-semibold">{scoreHistory[scoreHistory.length - 1]}</span></span>
                 </div>
+                <p className="text-xs text-slate-700 mt-2">Live session only. Full backtest available via <span className="font-mono">/backtest/{'{token}'}/{'{chain}'}</span></p>
               </>
             ) : (
               <p className="text-xs text-slate-700">Waiting for snapshots…</p>

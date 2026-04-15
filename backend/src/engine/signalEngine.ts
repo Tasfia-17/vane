@@ -11,11 +11,11 @@ const WEIGHTS = {
 } as const
 
 function scoreToMode(score: number): DangerScore['mode'] {
-  if (score <= 20) return 'RELAXED'
-  if (score <= 40) return 'NORMAL'
-  if (score <= 60) return 'ALERT'
-  if (score <= 80) return 'WARNING'
-  return 'CRITICAL'
+  if (score === 0)   return 'RELAXED'   // no signals at all
+  if (score <= 25)   return 'NORMAL'    // minor signals, no action needed
+  if (score <= 50)   return 'ALERT'     // one whale selling
+  if (score <= 75)   return 'WARNING'   // multiple signals
+  return 'CRITICAL'                     // dev wallet move or multi-whale confluence
 }
 
 export function stopMultiplier(mode: DangerScore['mode']): number {
@@ -56,8 +56,9 @@ export function scoreFromSnapshot(
 ): DangerScore {
   const s = getState(positionId)
   const signals: Signal[] = []
-  // Score is computed fresh each time — no accumulation across snapshots
-  let score = 50  // neutral baseline
+  // Score starts at 0 — signals add danger or subtract it.
+  // No signals = RELAXED (0-20). Score only rises when bad things are detected.
+  let score = 0
   const now = new Date()
 
   if (s.prevSnapshot) {

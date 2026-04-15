@@ -4,10 +4,10 @@ import type { DangerScore } from '@/lib/types'
 const MODE_CONFIG: Record<DangerScore['mode'], {
   color: string; bg: string; bar: string; glow: string; label: string; stopHint: string
 }> = {
-  RELAXED:  { color: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/25', bar: 'bg-emerald-500', glow: 'glow-green', label: 'RELAXED', stopHint: 'Stop widened +20%' },
-  NORMAL:   { color: 'text-slate-300',   bg: 'bg-slate-500/8 border-slate-500/25',     bar: 'bg-slate-400',   glow: '',           label: 'NORMAL',  stopHint: 'Stop unchanged' },
-  ALERT:    { color: 'text-yellow-400',  bg: 'bg-yellow-500/8 border-yellow-500/30',   bar: 'bg-yellow-500',  glow: 'glow-yellow', label: 'ALERT',   stopHint: 'Stop tightened 30%' },
-  WARNING:  { color: 'text-orange-400',  bg: 'bg-orange-500/8 border-orange-500/30',   bar: 'bg-orange-500',  glow: 'glow-orange', label: 'WARNING', stopHint: 'Stop tightened 50%' },
+  RELAXED:  { color: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/25', bar: 'bg-emerald-500', glow: 'glow-green',  label: 'RELAXED',  stopHint: 'Stop widened +20% — whales accumulating' },
+  NORMAL:   { color: 'text-slate-300',   bg: 'bg-slate-500/8 border-slate-500/25',     bar: 'bg-slate-400',   glow: '',            label: 'NORMAL',   stopHint: 'Stop unchanged' },
+  ALERT:    { color: 'text-yellow-400',  bg: 'bg-yellow-500/8 border-yellow-500/30',   bar: 'bg-yellow-500',  glow: 'glow-yellow', label: 'ALERT',    stopHint: 'Stop tightened 30%' },
+  WARNING:  { color: 'text-orange-400',  bg: 'bg-orange-500/8 border-orange-500/30',   bar: 'bg-orange-500',  glow: 'glow-orange', label: 'WARNING',  stopHint: 'Stop tightened 50%' },
   CRITICAL: { color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/60',        bar: 'bg-red-500',     glow: 'glow-red',    label: 'CRITICAL', stopHint: 'HARD EXIT triggered' },
 }
 
