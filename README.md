@@ -123,51 +123,61 @@ The proxy wallet API at `POST /v1/thirdParty/tx/sendSwapOrder` creates orders wi
 
 ## Setup
 
-You need Node.js 18 or higher, a PostgreSQL instance, and an AVE Claw API key from cloud.ave.ai.
+You need Node.js 18 or higher and an AVE Claw API key from cloud.ave.ai. PostgreSQL is handled by Docker.
 
-**Get your API keys**
-
-Register at cloud.ave.ai to get your AVE API key. For proxy wallet trading you also need an access key, secret key, and assets ID from the same dashboard. The free plan gives you the data REST API. The pro plan adds WebSocket real-time streams.
-
-**Database**
+**Step 1 — Start the database**
 
 ```
-createdb vane
+docker compose up -d
 ```
 
-Or set DATABASE_URL in your .env to point at any existing Postgres instance. The schema is created automatically on first start.
+That's it for the database. Schema is created automatically on first backend start.
 
-**Backend**
+**Step 2 — Configure the backend**
 
 ```
 cd backend
 cp .env.example .env
 ```
 
-Edit .env and fill in your four AVE keys and your DATABASE_URL. Then:
+Open `.env` and fill in your four AVE keys:
 
 ```
-npm install
-npm run dev
+AVE_API_KEY=        # from cloud.ave.ai dashboard
+AVE_ACCESS_KEY=     # from cloud.ave.ai dashboard
+AVE_SECRET_KEY=     # from cloud.ave.ai dashboard
+AVE_ASSETS_ID=      # your proxy wallet assets ID
+API_PLAN=free       # free / normal / pro
 ```
 
-**Frontend**
+Leave `DATABASE_URL` as-is if you used Docker Compose.
+
+**Step 3 — Run**
 
 ```
-cd frontend
-npm install
-npm run dev
+cd backend && npm install && npm run dev
+cd frontend && npm install && npm run dev
 ```
 
 Open http://localhost:3000.
 
 **What works on free plan vs pro plan**
 
-On the free plan: holder polling every 60 seconds, risk checks, token price, and proxy wallet trading all work. The DEV WALLET MOVE signal (real-time WebSocket detection) requires the pro plan. Set API_PLAN=free in .env and the tx listener is skipped automatically with a log message.
+On the free plan: holder polling every 60s, risk checks, token price, proxy wallet trading all work. The DEV WALLET MOVE signal (real-time WebSocket detection) requires the pro plan. Set `API_PLAN=free` and the tx listener is skipped automatically.
 
-**To open a position from the UI**
+**To open a position**
 
-You need the token contract address and the DEX pair address. Both are visible on DEX Screener or Birdeye for any token. Enter them in the form, pick your chain, set your USD amount, and click open. VANE runs a honeypot check before placing the order. If the token is flagged as a honeypot or CRITICAL risk, the order is blocked.
+You need the token contract address and the DEX pair address. Both are visible on DEX Screener or Birdeye for any token. VANE runs a honeypot check before placing the order — if the token is flagged, the order is blocked.
+
+**Backtest a token**
+
+Once a position has been open long enough to accumulate holder snapshots:
+
+```
+GET http://localhost:3001/backtest/{tokenAddress}/{chain}
+```
+
+Returns the full score history replayed from stored snapshots.
 
 <br/>
 
